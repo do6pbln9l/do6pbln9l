@@ -40,6 +40,93 @@
 
 ---
 
+## 🏗️ Архитектура
+
+<details open>
+  <summary> Click to collapse</summary>
+
+![OAuth2 Infrastructure](https://github.com/do6pbln9l/hh-oauth2-keendns-nginx-systemd/blob/main/docs/images/oauth2-infrastructure-diagram.png?raw=true)
+
+</details>
+
+### 🖥️ View Mermaid diagram (desktop version)
+<details close>
+  <summary> Click to expand</summary>
+
+```mermaid
+flowchart TB
+    
+    subgraph infra["📦 OAuth2 Infrastructure (Этот репозиторий)"]
+        direction TB
+        Nginx[🔄 nginx<br/>HTTP:80→:8000]
+        
+        subgraph automation["⚙️ Automation"]
+            direction LR
+            Timer[⏱️ systemd<br/>Каждые 6h]
+            Script[📜 refresh.sh<br/>Обновление токенов]
+        end
+        
+        TestServer[🧪 test-8000.py<br/>Тестовый сервер]
+        TokenStore[(🔐 Token Storage<br/>/var/lib/hh-token/token.json)]
+    end
+    
+    subgraph prod["🤖 Production App (Отдельный проект)"]
+        direction TB
+        TelegramBot[📱 Telegram Bot<br/>Поиск вакансий HH]
+        FlaskApp[🌐 Flask Application<br/>Обработка OAuth callback на /callback]
+        
+        TelegramBot -.->|Проект<br/>hh-oauth2-keendns-nginx-systemd| FlaskApp
+    end
+    
+    subgraph external["External"]
+        HHAPI[🏢 HH OAuth2 API<br/>api.hh.ru]
+    end
+    
+    %% Connections / Связи между компонентами
+
+    %% Main Flow (OAuth) (основной поток):
+    Nginx -->|1. Proxy :8000| FlaskApp
+    FlaskApp -->|2. OAuth callback| HHAPI
+    FlaskApp -->|3. Сохраняет первый tokens| TokenStore
+
+    %% Production Flow (работа приложения):
+    FlaskApp -->|4. Считывание tokens| TokenStore
+    TelegramBot <-->|5. API запросы| HHAPI
+
+    %% Token Refresh Flow (автоматизация):
+    Timer -.->|6. Trigger| Script
+    Script -->|7. Обновляет tokens| HHAPI
+    Script -->|8. Сохраняет new tokens| TokenStore  
+
+    %% Testing (тестирование):
+    TestServer -->|9. Альтернатива для<br/>тестирования| Nginx
+    
+    %% Styling
+    style Nginx fill:#2E8B57,color:#FFFFFF,stroke:#1a5f3a,stroke-width:2px
+    style Timer fill:#FFA500,color:#000000,stroke:#cc8400,stroke-width:2px
+    style Script fill:#FF8C00,color:#FFFFFF,stroke:#cc7000,stroke-width:2px
+    style TestServer fill:#DAA520,color:#000000,stroke:#b8860b,stroke-width:2px
+    style TokenStore fill:#9370DB,color:#FFFFFF,stroke:#6a4db8,stroke-width:2px
+    
+    style TelegramBot fill:#4682B4,color:#FFFFFF,stroke:#1565c0,stroke-width:2px
+    style FlaskApp fill:#4169E1,color:#FFFFFF,stroke:#2a4ba8,stroke-width:2px
+    
+    style HHAPI fill:#DC143C,color:#FFFFFF,stroke:#a00000,stroke-width:2px
+```
+
+### Цветовая схема
+
+- 🟢 Зелёный — инфраструктурные компоненты (nginx)
+- 🟠 Оранжевый — автоматизация (systemd timer, Bash scripts)
+- 🟡 Золотой — тестовые/вспомогательные инструменты (test-8000.py)
+- 🟣 Фиолетовый — хранилище данных (Token Storage)
+- 🔵 Синий — продакшен-приложение (Telegram Bot, Flask App)
+- 🔴 Красный — внешние API (HeadHunter)
+
+</details>
+
+---
+
 ## 📫 Контакты
 
 💼 HH.ru: [Резюме DevOps/SRE](https://hh.ru/resume/e2cf5fedff07cc20d30039ed1f494e42465951?from=share_ios)
