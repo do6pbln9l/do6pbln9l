@@ -1,49 +1,49 @@
-# 👋 Привет! Я Александр Добрынин
+# 👋 Hi! I'm Alexander Dobrynin
 
-**DevOps/SRE-инженер** с 3+ годами опыта построения отказоустойчивой инфраструктуры  
-📍 Москва | 🏠 Remote-friendly | 🇷🇺 Русский
-
----
-
-## 🛠️ Технологический стек
-
-**Инфраструктура:** Linux (Debian/Ubuntu), Proxmox VE/PBS, Docker, KVM/LXC  
-**Автоматизация:** Bash, systemd, GitHub Actions, CI/CD  
-**Базы данных:** PostgreSQL (репликация, backups)  
-**Сети:** nginx, VLAN, DNS, TLS (Let's Encrypt)  
-**Мониторинг:** Alarms, logging, capacity planning  
-
-**В изучении:** Kubernetes, Terraform, Ansible, Prometheus/Grafana
+**DevOps/SRE Engineer** with 3+ years of experience building fault-tolerant infrastructure  
+📍 Moscow | 🏠 Remote-friendly | 🇷🇺 Russian
 
 ---
 
-## 🚀 Проекты
+## 🛠️ Technology Stack
+
+**Infrastructure:** Linux (Debian/Ubuntu), Proxmox VE/PBS, Docker, KVM/LXC  
+**Automation:** Bash, systemd, GitHub Actions, CI/CD  
+**Databases:** PostgreSQL (replication, backups)  
+**Networking:** nginx, VLAN, DNS, TLS (Let's Encrypt)  
+**Monitoring:** Alarms, logging, capacity planning  
+
+**Currently learning:** Kubernetes, Terraform, Ansible, Prometheus/Grafana
+
+---
+
+## 🚀 Projects
 
 ### [OAuth2 Infrastructure Automation](https://github.com/do6pbln9l/hh-oauth2-keendns-nginx-systemd)
-Автоматизация OAuth2-инфраструктуры для HeadHunter API:
-- ✅ CI/CD через GitHub Actions (ShellCheck, Docker build/push в GHCR)
-- ✅ Автообновление токенов через systemd timers (каждые 6 часов)
+OAuth2 infrastructure automation for HeadHunter API:
+- ✅ CI/CD via GitHub Actions (ShellCheck, Docker build/push to GHCR)
+- ✅ Automated token refresh via systemd timers (every 6 hours)
 - ✅ nginx reverse-proxy + KeenDNS + Let's Encrypt
-- ✅ Infrastructure as Code (все конфигурации в Git)
+- ✅ Infrastructure as Code (all configs in Git)
 
-**Технологии:** Docker, GitHub Actions, systemd, nginx, OAuth2
-
----
-
-## 📊 Ключевые достижения
-
-- ✅ **100% автоматизация** обновления OAuth2 токенов (было: вручную каждые 2 недели → стало: systemd timer каждые 6 часов)
-- ✅ **Uptime 99.9%** за последние 6 месяцев (Proxmox VE HA-кластер, 3 ноды)
-- ✅ **RTO < 30 минут** для восстановления сервисов (test-restores каждые 3 месяца)
-- ✅ **CI/CD pipeline**: ShellCheck (100% compliance) + Docker автосборка в GHCR
-- ✅ **Сокращение toil с 40% до 10%** через автоматизацию рутинных задач
+**Technologies:** Docker, GitHub Actions, systemd, nginx, OAuth2
 
 ---
 
-## 🏗️ Архитектура
+## 📊 Key Achievements
+
+- ✅ **100% automation** of OAuth2 token refresh (was: manual every 2 weeks → now: systemd timer every 6 hours)
+- ✅ **99.9% uptime** over the last 6 months (Proxmox VE HA cluster, 3 nodes)
+- ✅ **RTO < 30 minutes** for service recovery (test-restores every 3 months)
+- ✅ **CI/CD pipeline**: ShellCheck (100% compliance) + automated Docker builds to GHCR
+- ✅ **Reduced toil from 40% to 10%** through automation of routine tasks
+
+---
+
+## 🏗️ Architecture
 
 <details open>
-  <summary> Click to collapse</summary>
+  <summary>Click to collapse</summary>
 
 ![OAuth2 Infrastructure](https://github.com/do6pbln9l/hh-oauth2-keendns-nginx-systemd/blob/main/docs/images/oauth2-infrastructure-diagram.png?raw=true)
 
@@ -51,55 +51,54 @@
 
 ### 🖥️ View Mermaid diagram (desktop version)
 <details close>
-  <summary> Click to expand</summary>
-
+  <summary>Click to expand</summary>
+  
 ```mermaid
 flowchart TB
-    
-    subgraph infra["📦 OAuth2 Infrastructure (Этот репозиторий)"]
+    subgraph infra["📦 OAuth2 Infrastructure (This repository)"]
         direction TB
         Nginx[🔄 nginx<br/>HTTP:80→:8000]
         
         subgraph automation["⚙️ Automation"]
             direction LR
-            Timer[⏱️ systemd<br/>Каждые 6h]
-            Script[📜 refresh.sh<br/>Обновление токенов]
+            Timer[⏱️ systemd<br/>Every 6h]
+            Script[📜 refresh.sh<br/>Token refresh]
         end
         
-        TestServer[🧪 test-8000.py<br/>Тестовый сервер]
+        TestServer[🧪 test-8000.py<br/>Test server]
         TokenStore[(🔐 Token Storage<br/>/var/lib/hh-token/token.json)]
     end
     
-    subgraph prod["🤖 Production App (Отдельный проект)"]
+    subgraph prod["🤖 Production App (Separate project)"]
         direction TB
-        TelegramBot[📱 Telegram Bot<br/>Поиск вакансий HH]
-        FlaskApp[🌐 Flask Application<br/>Обработка OAuth callback на /callback]
+        TelegramBot[📱 Telegram Bot<br/>HH job search]
+        FlaskApp[🌐 Flask Application<br/>OAuth callback handler at /callback]
         
-        TelegramBot -.->|Проект<br/>hh-oauth2-keendns-nginx-systemd| FlaskApp
+        TelegramBot -.->|Project<br/>hh-oauth2-keendns-nginx-systemd| FlaskApp
     end
     
     subgraph external["External"]
         HHAPI[🏢 HH OAuth2 API<br/>api.hh.ru]
     end
     
-    %% Connections / Связи между компонентами
-
-    %% Main Flow (OAuth) (основной поток):
+    %% Connections / Component interactions
+    
+    %% Main Flow (OAuth):
     Nginx -->|1. Proxy :8000| FlaskApp
     FlaskApp -->|2. OAuth callback| HHAPI
-    FlaskApp -->|3. Сохраняет первый tokens| TokenStore
-
-    %% Production Flow (работа приложения):
-    FlaskApp -->|4. Считывание tokens| TokenStore
-    TelegramBot <-->|5. API запросы| HHAPI
-
-    %% Token Refresh Flow (автоматизация):
+    FlaskApp -->|3. Saves initial tokens| TokenStore
+    
+    %% Production Flow:
+    FlaskApp -->|4. Reads tokens| TokenStore
+    TelegramBot <-->|5. API requests| HHAPI
+    
+    %% Token Refresh Flow:
     Timer -.->|6. Trigger| Script
-    Script -->|7. Обновляет tokens| HHAPI
-    Script -->|8. Сохраняет new tokens| TokenStore  
-
-    %% Testing (тестирование):
-    TestServer -->|9. Альтернатива для<br/>тестирования| Nginx
+    Script -->|7. Refreshes tokens| HHAPI
+    Script -->|8. Saves new tokens| TokenStore  
+    
+    %% Testing:
+    TestServer -->|9. Testing alternative| Nginx
     
     %% Styling
     style Nginx fill:#2E8B57,color:#FFFFFF,stroke:#1a5f3a,stroke-width:2px
@@ -112,27 +111,29 @@ flowchart TB
     style FlaskApp fill:#4169E1,color:#FFFFFF,stroke:#2a4ba8,stroke-width:2px
     
     style HHAPI fill:#DC143C,color:#FFFFFF,stroke:#a00000,stroke-width:2px
+
 ```
+  
+### Color Legend
 
-### Цветовая схема
-
-- 🟢 Зелёный — инфраструктурные компоненты (nginx)
-- 🟠 Оранжевый — автоматизация (systemd timer, Bash scripts)
-- 🟡 Золотой — тестовые/вспомогательные инструменты (test-8000.py)
-- 🟣 Фиолетовый — хранилище данных (Token Storage)
-- 🔵 Синий — продакшен-приложение (Telegram Bot, Flask App)
-- 🔴 Красный — внешние API (HeadHunter)
+- 🟢 Green — infrastructure components (nginx)
+- 🟠 Orange — automation (systemd timer, Bash scripts)
+- 🟡 Gold — testing/auxiliary tools (test-8000.py)
+- 🟣 Purple — data storage (Token Storage)
+- 🔵 Blue — production application (Telegram Bot, Flask App)
+- 🔴 Red — external APIs (HeadHunter)
 
 </details>
 
 ---
 
-## 📫 Контакты
+## 📫 Contact
 
-💼 HH.ru: [Резюме DevOps/SRE](https://hh.ru/resume/e2cf5fedff07cc20d30039ed1f494e42465951?from=share_ios)
+💼 HH.ru: [DevOps/SRE Resume](https://hh.ru/resume/e2cf5fedff07cc20d30039ed1f494e42465951?from=share_ios)
 
-💬 **Предпочитаемый способ связи:** Отклик через HH или email из резюме 
+💬 **Preferred contact method:** Apply via HH or email from resume 
 
 ---
 
 🏠 **Working from home** | 🌟 **Open to DevOps/SRE opportunities**
+
