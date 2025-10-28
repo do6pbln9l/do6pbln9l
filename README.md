@@ -1,4 +1,4 @@
-# 👋 Hi! I'm Alexander Dobrynin
+# 👋 Hi! I'm Aleksandr Dobrynin
 
 **DevOps/SRE Engineer** with 3+ years of experience building fault-tolerant infrastructure  
 📍 Moscow | 🏠 Remote-friendly | 🇷🇺 Russian
